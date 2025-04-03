@@ -1,0 +1,90 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"title": "Pairwise Taxonomy Mapping", 
+	"description": "For describing how clusters (and higher-level classes of cells) are related between two cell type taxonomies.",
+	"definitions": {
+		"species": {
+			"type": "string"
+		},
+		"species_list": {
+			"description": "Some taxonomies may describe >1 species.",
+			"type": "array",
+			"items": { "$ref": "#definitions/species" },
+			"minItems": 1
+		},
+		"taxonomy": {
+			"type": "object",
+			"description": "This file does not contain complete info about each taxonomy's taxons. It is expected users can find complete info at the url specified in this object.",
+			"properties":{
+				"id": {"type": "string"},
+				"title": {"type": "string"},
+				"citation": {"type": "string"},
+				"url": {"type": "string"},
+				"species_list": { "$ref": "#/definitions/species_list"}
+			},
+			"required": ["id", "title", "url", "species_list"]
+		},
+		"dataset": {
+			"type": "object",
+			"properties": {
+				"id": {"type":"string"},
+				"title": {"type": "string"},
+				"citation": {"type": "string"},
+				"data_file_url": {
+					"type": "string",
+					"description": "File where someone can access the single-cell data to replicate creating overlap metrics."
+				},
+				"species_list": { "$ref": "#/definitions/species_list"}
+			},
+			"required": ["id", "title", "data_file_url", "species_list"]
+		},
+		"related_taxon": {
+			"type": "object",
+			"properties": {
+				"id": {"type":"string"},
+				"overlap_metric": {"type": "number"},
+				"relationship_type": {"type": "string"}
+			},
+			"required": ["id"]
+		},
+		"mapping": {
+			"description": "For taxons in taxonomy A, which taxon(s) in taxonomy B are related. If a taxon in taxonomy A is not related to any taxons in taxonomy B, it should NOT be included in this list; omissions are information.",
+			"type": "object",
+			"properties": {
+				"taxon_A_id": {"type": "string"},
+				"hierharchy_in_A": {"type": "string"},
+				"related_taxons_in_B": {
+					"description": "There can be 1:many relationships for a given taxon.",
+					"type": "array",
+					"items": { "$ref": "#definitions/related_taxon"},
+					"minItems": 1
+				}
+			},
+			"required": ["taxon_A_id", "related_taxons_in_B"]
+		}
+	},
+	"type": "object",
+	"properties": {
+		"taxonomies": {
+			"description": "The two taxononmies A and B mapped to each other.",
+			"type": "array",
+			"items": { "$ref": "#/definitions/taxonomy"	},
+			"uniqueItems": true,
+			"minItems": 2,
+			"maxItems": 2
+		},
+		"datasets": {
+			"description": "List of single-cell datasets used to compute the 'overlap' metrics, i.e. how many cells labels as taxon_A were also labeled as taxon_B.",
+			"type": "array",
+			"items": { "$ref": "#definitions/dataset"},
+			"uniqueItems": true,
+			"minItems": 2,
+			"maxItems": 2
+		},
+		"mappings":{
+			"type": "array",
+			"items": { "$ref": "#definitions/mapping"}
+		}
+	},
+	"required": [ "taxonomies", "mappings"]
+}
