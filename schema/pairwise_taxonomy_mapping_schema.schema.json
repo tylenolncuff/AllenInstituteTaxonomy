@@ -42,6 +42,7 @@
 			"type": "object",
 			"properties": {
 				"id": {"type":"string"},
+				"hierharchy_in_B": {"type": "string"},
 				"overlap_metric": {"type": "number"},
 				"relationship_type": {"type": "string"}
 			},
